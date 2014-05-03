@@ -5,6 +5,7 @@
  * the map can subscribe to the necessary channels.
  */
 function umap_subscribe() {
+    console.log("subscribing to umap channels");
     // OVERLAYS
     umap.Eventing.subscribe('map.overlay.create', umap.Eventing.onMessage);
     umap.Eventing.subscribe('map.overlay.remove', umap.Eventing.onMessage);

@@ -3,5 +3,7 @@ owfdojo.addOnLoad(function () {
 });
 
 function init() {
+    console.log('init relay widget');
     umap_subscribe();
+
 }
