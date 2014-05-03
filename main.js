@@ -1,10 +1,7 @@
 //OWF.relayFile = '/rpc_relay.uncompressed.html';
 
 function init() {
-    console.log('init relay widget');
     umap.Eventing.init();
-    console.log('umap init');
-
 }
 
 $(document).ready(function () {
@@ -14,7 +11,6 @@ $(document).ready(function () {
     }
 
     OWF.ready(function () {
-        widgetId = JSON.parse(Ozone.eventing.Widget.getInstance().getWidgetId()).id;
         init();
     });
 });
