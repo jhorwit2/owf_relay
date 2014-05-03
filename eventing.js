@@ -40,7 +40,7 @@
 
         function onMessage(sender_uid, message, channel) {
             sender_uid = $.parseJSON(sender_uid);
-            if (_(sender_uid).isEqual(OWF.getInstanceUID()) {
+            if (_(sender_uid).isEqual(OWF.getInstanceUID())) {
                 return;
             }
 
