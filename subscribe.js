@@ -6,6 +6,9 @@
  */
 function umap_subscribe() {
     console.log("subscribing to umap channels");
+    console.log(umap.Eventing.onMessage);
+    umap.Eventing.init();
+    console.log('umap init');
     // OVERLAYS
     umap.Eventing.subscribe('map.overlay.create', umap.Eventing.onMessage);
     umap.Eventing.subscribe('map.overlay.remove', umap.Eventing.onMessage);

@@ -39,6 +39,8 @@
         }
 
         function onMessage(channel, message) {
+            console.log("on message called");
+            console.log(channel, message);
             if (exists(window.relay)) {
                 setTimeout(window.relay.publish(channel, message), 0);
             }
