@@ -1,9 +1,9 @@
-OWF.relayFile = '/owf-sample-html/js/eventing/rpc_relay.uncompressed.html';
+OWF.relayFile = '/rpc_relay.uncompressed.html';
 
 console.log(owfdojo);
 
 owfdojo.addOnLoad(function () {
-    conosle.log('add on load');
+    console.log('add on load');
     OWF.ready(init);
 });
 
