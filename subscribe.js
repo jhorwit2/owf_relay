@@ -4,11 +4,13 @@
  * This method needs to be called when the eventing object is ready, so
  * the map can subscribe to the necessary channels.
  */
+$(window).bind('socketConnected', function() {
+    umap_subscribe();
+  });
+
 function umap_subscribe() {
     console.log("subscribing to umap channels");
-    console.log(umap.Eventing.onMessage);
-    umap.Eventing.init();
-    console.log('umap init');
+
     // OVERLAYS
     umap.Eventing.subscribe('map.overlay.create', umap.Eventing.onMessage);
     umap.Eventing.subscribe('map.overlay.remove', umap.Eventing.onMessage);

@@ -9,6 +9,7 @@ owfdojo.addOnLoad(function () {
 
 function init() {
     console.log('init relay widget');
-    umap_subscribe();
+    umap.Eventing.init();
+    console.log('umap init');
 
 }

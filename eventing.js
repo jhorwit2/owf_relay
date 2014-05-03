@@ -56,6 +56,7 @@
 
             // If the widget has a relay established, then send to relay.
             if (typeof window.loadRelay === 'function') {
+                console.log('load relay');
                 window.loadRelay('http://horwitzja.com:3000/');
             }
         }
