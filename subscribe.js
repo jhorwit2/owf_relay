@@ -32,4 +32,7 @@ function umap_subscribe() {
     umap.Eventing.subscribe('map.view.center.feature', umap.Eventing.onMessage);
     umap.Eventing.subscribe('map.view.center.location', umap.Eventing.onMessage);
     umap.Eventing.subscribe('map.view.center.bounds', umap.Eventing.onMessage);
+
+    // STATUS
+    umap.Eventing.subscribe('map.status.view', umap.Eventing.onMessage);
 }
