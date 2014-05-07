@@ -35,17 +35,17 @@
          *   the uid of the widget that published this message.
          */
         function onServerReceive(channel, message, sender_uid) {
-            OWF.Eventing.publish(channel, JSON.stringify(message));
+            OWF.Eventing.publish(channel,JSON.stringify( message));
         }
 
         function onMessage(sender_uid, message, channel) {
             sender_uid = $.parseJSON(sender_uid);
             if (sender_uid.id === OWF.getInstanceId()) {
-                return;
+	        return;
             }
 
             if (exists(window.relay)) {
-                message = $.parseJSON(message);
+		message = $.parseJSON(message);
                 setTimeout(window.relay.publish(channel, message), 0);
             }
         }
@@ -60,7 +60,7 @@
 
             // If the widget has a relay established, then send to relay.
             if (typeof window.loadRelay === 'function') {
-                window.loadRelay('http://horwitzja.com:3000/');
+                window.loadRelay('https://horwitzja.com/');
             }
         }
 
