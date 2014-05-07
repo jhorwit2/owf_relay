@@ -26,7 +26,6 @@
 	background-color: #FFFFFF;
 }
 .room-manager-menu {
-	display: none;
 	position: absolute;
 	z-index: 1;
 	background-color: #FFF;

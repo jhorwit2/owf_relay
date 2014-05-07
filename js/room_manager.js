@@ -64,11 +64,6 @@ $(document).ready(function () {
             loadRooms();
         }, 10000);
 
-        $('#room-manager-tab').click(function () {
-            $('#room-manager-menu').slideToggle();
-            $('#room-manager-icon').toggleClass('glyphicon-chevron-down');
-            $('#room-manager-icon').toggleClass('glyphicon-chevron-up');
-        });
         $('#roomNameSubmit').click( function () {
             roomName = $('#roomName').val();
             if (roomName !== "") {
