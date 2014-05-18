@@ -86,7 +86,7 @@
             OWF.Eventing.subscribe(channel, callback);
 
             if (exists(window.relay)) {
-                return subscribe(channel, onServerReceive);
+                return window.relay.subscribe(channel, onServerReceive);
             }
             return true;
         }
