@@ -6,6 +6,7 @@ $(document).ready(function () {
     }
 
     OWF.ready(function () {
+        console.log('initializing the eventing object');
         // Start the eventing object pointed to the socket server.
         umap.Eventing.init('https://gmul-pf-app01.pf.cee-w.net/umap/', true);
     });

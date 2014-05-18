@@ -184,7 +184,9 @@ var loadRelay = function (host, secure) {
      * This creates support for multiple widgets in the same tab or
      * various uMap widgets in different tabs.
      */
+    console.log('about to try and connect');
     secure = !secure ? false : secure; // If secure isn't defined then false else secure.
+    console.log('secure: ' + secure);
     var socket = io.connect(host, {secure: secure, 'force new connection':true});
 
     /*
