@@ -79,18 +79,22 @@ function addUser(user) {
 
 $(document).ready(function () {
     $(window).bind('socketConnected', function(e) {
+        console.log('socket connected');
         loadRooms();
+        console.log('rooms loaded');
         var refreshCount = setInterval( function() { //reload users every 10 sec
             loadRooms();
         }, 5000);
 
         $('#room-manager-tab').click( function () {
+            console.log('room manager tab clicked');
         	$('#room-manager-menu').slideToggle();
         	$('#room-manager-icon').toggleClass('glyphicon-chevron-down');
         	$('#room-manager-icon').toggleClass('glyphicon-chevron-up');
         });
 
         $('#roomNameSubmit').click( function () {
+            console.log('room name submit');
         	var roomName = $('#roomName').val();
         	if (roomName !== "") {
         		$('#roomName').val("");
@@ -100,6 +104,7 @@ $(document).ready(function () {
         });
 
         $('#userNameSubmit').click( function () {
+            console.log('change user name submit');
         	userName = $('#userName').val();
         	if (userName !== "") {
         		$('#userName').val("");
@@ -110,6 +115,7 @@ $(document).ready(function () {
 
         $(window).keydown(function (event){
             if(event.keyCode === 13) {  //if enter key is clicked
+                console.log('enter clicked');
             	event.preventDefault();
             	if ($('#roomName').is(':focus')) {
             		$('#roomNameSubmit').click();
