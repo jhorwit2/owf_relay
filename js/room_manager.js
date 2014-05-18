@@ -1,27 +1,38 @@
+var rooms = [];
+var users = [];
+
 function loadRooms() {
-    $('#room-list').html("");
     try {
-        window.relay.getCurrentRoom(function (currentRoom) {
-            addRoom(currentRoom);
-            $('#btn_' + currentRoom).addClass('current');
-            window.relay.getAllRooms(function (allRooms) {
-                _(allRooms).each(function (room) {
-                    if (room !== currentRoom) {
-                        addRoom(room);
-                    }
+        window.relay.getAllRooms(function (allRooms) {
+            var cr;
+            if ($(rooms).not(allRooms).length !== 0 || $(allRooms).not(rooms).length !== 0) { //if array don't contain same elements
+                $('#room-list').html("");
+                rooms = [];
+                window.relay.getCurrentRoom( function (currentRoom) {
+                    addRoom(currentRoom);
+                    $('#btn_' + currentRoom).addClass('current');
+                    rooms.push(currentRoom);
+					_(allRooms).each(function (room) {
+						if (room !== currentRoom) {
+							addRoom(room);
+							rooms.push(room);
+						}
+					});
+                    cr = currentRoom;
                 });
-            });
-            getUsers(currentRoom);
+            }
+            getUsers(cr);
         });
     } catch(err) {
         console.log(err);
     }
 }
+
 function addRoom(room) {
     $('#room-list').append(
         $('<li>').attr({
-            'class': 'room-btn col-sm-4',
-            'id': 'btn_' + room
+        	'class': 'room-btn col-sm-4',
+        	'id': 'btn_' + room
         }).append(
             $('<a>').attr('href','#').append(room)
         )
@@ -32,63 +43,80 @@ function addRoom(room) {
         loadRooms();
     });
 }
+
 function getUsers(room) {
-    $('#room-users').html("");
-    window.relay.getUsername(function (currentUser) {
-        addUser(currentUser);
-        $('#user_' + currentUser).addClass('current');
-        window.relay.getAllUsers(function (allUsers) {
-            _(allUsers).each(function (user) {
-                if (user !== currentUser) {
-                    addUser(user);
-                }
+    window.relay.getAllUsers(function (allUsers) {
+        var cu;
+        if ($(users).not(allUsers).length !== 0 || $(allUsers).not(users).length !== 0) { //if array don't contain same elements
+            $('#room-users').html("");
+            users = [];
+            window.relay.getUsername(function (currentUser) {
+                addUser(currentUser);
+                $('#user_' + currentUser).addClass('current');
+                users.push(currentUser);
+                _(allUsers).each(function (user) {
+					if (user !== currentUser) {
+						addUser(user);
+						users.push(user);
+					}
+				});
+                cu = currentUser;
             });
-        });
+        }
     });
 }
+
 function addUser(user) {
     $('#room-users').append(
         $('<li>').attr({
-            'class': 'user',
-            'id': 'user_' + user
+        	'class': 'user',
+        	'id': 'user_' + user
         }).append(
-            $('<a>').html(user)
+        	$('<a>').html(user)
         )
     );
 }
 
 $(document).ready(function () {
-    $(window).bind('relayLoaded', function(e) {
+    $(window).bind('socketConnected', function(e) {
         loadRooms();
         var refreshCount = setInterval( function() { //reload users every 10 sec
             loadRooms();
-        }, 10000);
+        }, 5000);
 
-        $('#roomNameSubmit').click(function () {
-            var roomName = $('#roomName').val();
-            if (roomName !== "") {
-                $('#roomName').val("");
-                relay.switchRoom(roomName);
-                loadRooms();
-            }
+        $('#room-manager-tab').click( function () {
+        	$('#room-manager-menu').slideToggle();
+        	$('#room-manager-icon').toggleClass('glyphicon-chevron-down');
+        	$('#room-manager-icon').toggleClass('glyphicon-chevron-up');
         });
-        $('#userNameSubmit').click(function () {
-            var userName = $('#userName').val();
-            if (userName !== "") {
-                $('#userName').val("");
-                relay.setUsername(userName);
-                $('#room-users .current a').html(userName);
-            }
+
+        $('#roomNameSubmit').click( function () {
+        	var roomName = $('#roomName').val();
+        	if (roomName !== "") {
+        		$('#roomName').val("");
+        		relay.switchRoom(roomName);
+        		loadRooms();
+        	}
         });
-        $(window).keydown(function(event){
-            if(event.keyCode == 13) {  //if enter key is clicked
-                event.preventDefault();
-                if ($('#roomName').is(':focus')) {
-                    $('#roomNameSubmit').click();
-                } else if ($('#userName').is(':focus')) {
-                    $('#userNameSubmit').click();
-                }
-                return false;
+
+        $('#userNameSubmit').click( function () {
+        	userName = $('#userName').val();
+        	if (userName !== "") {
+        		$('#userName').val("");
+        		relay.setUsername(userName);
+        		$('#room-users .current a').html(userName);
+        	}
+        });
+
+        $(window).keydown(function (event){
+            if(event.keyCode === 13) {  //if enter key is clicked
+            	event.preventDefault();
+            	if ($('#roomName').is(':focus')) {
+            		$('#roomNameSubmit').click();
+            	} else if ($('#userName').is(':focus')) {
+            		$('#userNameSubmit').click();
+            	}
+            	return false;
             }
         });
     });

@@ -84,7 +84,7 @@
             OWF.Eventing.subscribe(channel, callback);
 
             if (exists(window.relay)) {
-                window.relay.subscribe(channel, onServerReceive);
+                return subscribe(channel, onServerReceive);
             }
             return true;
         }
@@ -98,7 +98,10 @@
          * @return {Boolean} Returns false if not subscribed, true when removed
          */
         function unsubscribe(channel) {
-            // TODO: implement later if we want this...
+            if (exists(window.relay)) {
+                return window.relay.unsubscribe(channel);
+            }
+            return false;
         }
 
         /**
@@ -114,8 +117,9 @@
             OWF.Eventing.pubish(channel, message);
 
             if (exists(window.relay)) {
-                setTimeout(window.relay.publish(channel, message), 0);
+                return window.relay.publish(channel, message);
             }
+            return true;
         }
 
         /*
