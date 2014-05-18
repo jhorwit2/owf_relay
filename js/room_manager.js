@@ -1,15 +1,15 @@
 function loadRooms() {
     $('#room-list').html("");
     try {
-        window.relay.getCurrentRoom( function (currentRoom) {
+        window.relay.getCurrentRoom(function (currentRoom) {
             addRoom(currentRoom);
             $('#btn_' + currentRoom).addClass('current');
             window.relay.getAllRooms(function (allRooms) {
-                for (i in allRooms) {
-                    if (allRooms[i] !== currentRoom) {
-                        addRoom(allRooms[i]);
+                _(allRooms).each(function (room) {
+                    if (room !== currentRoom) {
+                        addRoom(room);
                     }
-                }
+                });
             });
             getUsers(currentRoom);
         });
@@ -38,11 +38,11 @@ function getUsers(room) {
         addUser(currentUser);
         $('#user_' + currentUser).addClass('current');
         window.relay.getAllUsers(function (allUsers) {
-            for (i in allUsers) {
-                if (allUsers[i] !== currentUser) {
-                    addUser(allUsers[i]);
+            _(allUsers).each(function (user) {
+                if (user !== currentUser) {
+                    addUser(user);
                 }
-            }
+            });
         });
     });
 }
@@ -64,18 +64,18 @@ $(document).ready(function () {
             loadRooms();
         }, 10000);
 
-        $('#roomNameSubmit').click( function () {
-            roomName = $('#roomName').val();
+        $('#roomNameSubmit').click(function () {
+            var roomName = $('#roomName').val();
             if (roomName !== "") {
-                $('#roomName').val("")
+                $('#roomName').val("");
                 relay.switchRoom(roomName);
                 loadRooms();
             }
         });
-        $('#userNameSubmit').click( function () {
-            userName = $('#userName').val();
+        $('#userNameSubmit').click(function () {
+            var userName = $('#userName').val();
             if (userName !== "") {
-                $('#userName').val("")
+                $('#userName').val("");
                 relay.setUsername(userName);
                 $('#room-users .current a').html(userName);
             }

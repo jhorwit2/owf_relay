@@ -13,7 +13,7 @@
  * @param {String} host
  *   the host to connect to (ex: http://localhost:3000).
  */
-var loadRelay = function (host) {
+var loadRelay = function (host, secure) {
 
 /*
  * The root here is the appropriate global context (e.g. window in
@@ -155,7 +155,7 @@ var loadRelay = function (host) {
         var lastToken = -1;
 
         return function tokenGenerator () {
-            return 't_' + (++lastToken);        
+            return 't_' + (++lastToken);
         };
     };
 
@@ -184,7 +184,9 @@ var loadRelay = function (host) {
      * This creates support for multiple widgets in the same tab or
      * various uMap widgets in different tabs.
      */
-    var socket = io.connect(host, {'force new connection':true});
+    // If secure is defined use the value, otherwise default to unsecure.
+    secure = secure ? secure : false;
+    var socket = io.connect(host, {secure: secure, 'force new connection':true});
 
     /*
      * Set up initial callbacks for status monitoring.
@@ -544,4 +546,3 @@ window.addEventListener('socketConnected', function () {
 });
 
 };
-

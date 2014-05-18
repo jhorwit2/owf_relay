@@ -55,11 +55,12 @@
          *
          * @public
          * @param {String} server_url: Domain where proxy html is located.
+         * @param {Boolean} secure: https if true, http if false or undefined
          */
-        function init(server_url) {
+        function init(server_url, secure) {
             // If the widget has a relay established, then send to relay.
             if (typeof window.loadRelay === 'function') {
-                window.loadRelay('https://horwitzja.com/');
+                window.loadRelay(server_url, secure);
             }
         }
 
@@ -110,7 +111,6 @@
          * @return {Boolean}
          */
         function publish(channel, message) {
-
             OWF.Eventing.pubish(channel, message);
 
             if (exists(window.relay)) {
@@ -122,8 +122,6 @@
          * Expose public interface.
          */
         return {
-            /* variables */
-
             /* methods */
             publish: publish,
             subscribe: subscribe,
