@@ -59,9 +59,7 @@
          */
         function init(server_url, secure) {
             // If the widget has a relay established, then send to relay.
-            console.log('enter init');
             if (typeof window.loadRelay === 'function') {
-                console.log('loading relay', server_url, secure);
                 window.loadRelay(server_url, secure);
             }
         }

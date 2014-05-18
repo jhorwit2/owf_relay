@@ -8,7 +8,7 @@ function loadRooms() {
             if ($(rooms).not(allRooms).length !== 0 || $(allRooms).not(rooms).length !== 0) { //if array don't contain same elements
                 $('#room-list').html("");
                 rooms = [];
-                window.relay.getCurrentRoom( function (currentRoom) {
+                window.relay.getCurrentRoom(function (currentRoom) {
                     addRoom(currentRoom);
                     $('#btn_' + currentRoom).addClass('current');
                     rooms.push(currentRoom);
@@ -80,7 +80,7 @@ function addUser(user) {
 $(document).ready(function () {
     $(window).bind('relayLoaded', function (e) {
         loadRooms();
-        var refreshCount = setInterval(loadRooms, 5000);
+        var refreshCount = setInterval(function() {loadRooms();}, 5000);
 
         $('#roomNameSubmit').click(function () {
             roomName = $('#roomName').val();
