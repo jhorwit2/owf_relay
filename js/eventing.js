@@ -35,6 +35,8 @@
          *   the uid of the widget that published this message.
          */
         function onServerReceive(channel, message, sender_uid) {
+            console.log('received from server');
+            console.log(channel, message, sender_uid);
             OWF.Eventing.publish(channel, JSON.stringify(message));
         }
 

@@ -90,6 +90,7 @@ $(document).ready(function () {
                 loadRooms();
             }
         });
+
         $('#userNameSubmit').click(function () {
             userName = $('#userName').val();
             if (userName !== "") {
@@ -98,6 +99,7 @@ $(document).ready(function () {
                 $('#room-users .current a').html(userName);
             }
         });
+
         $(window).keydown(function (event){
             if(event.keyCode === 13) {  //if enter key is clicked
                 event.preventDefault();
