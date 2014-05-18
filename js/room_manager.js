@@ -99,7 +99,9 @@ $(document).ready(function () {
             }
         });
         $(window).keydown(function (event){
-            if(event.keyCode == 13) {  //if enter key is clicked
+            console.log('key pressed');
+            if(event.keyCode === 13) {  //if enter key is clicked
+                console.log('enter pressed');
                 event.preventDefault();
                 if ($('#roomName').is(':focus')) {
                     $('#roomNameSubmit').click();
