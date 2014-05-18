@@ -6,11 +6,9 @@
  */
 $(window).bind('socketConnected', function() {
     umap_subscribe();
-  });
+});
 
 function umap_subscribe() {
-    console.log("subscribing to umap channels");
-
     // OVERLAYS
     umap.Eventing.subscribe('map.overlay.create', umap.Eventing.onMessage);
     umap.Eventing.subscribe('map.overlay.remove', umap.Eventing.onMessage);

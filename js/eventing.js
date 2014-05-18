@@ -55,11 +55,14 @@
          *
          * @public
          * @param {String} server_url: Domain where proxy html is located.
+         * @param {Boolean} secure: https if true, http if false or undefined
          */
-        function init(server_url) {
+        function init(server_url, secure) {
             // If the widget has a relay established, then send to relay.
+            console.log('enter init');
             if (typeof window.loadRelay === 'function') {
-                window.loadRelay('https://horwitzja.com/');
+                console.log('loading relay');
+                window.loadRelay(server_url, secure);
             }
         }
 
@@ -83,7 +86,7 @@
             OWF.Eventing.subscribe(channel, callback);
 
             if (exists(window.relay)) {
-                window.relay.subscribe(channel, onServerReceive);
+                return subscribe(channel, onServerReceive);
             }
             return true;
         }
@@ -97,7 +100,10 @@
          * @return {Boolean} Returns false if not subscribed, true when removed
          */
         function unsubscribe(channel) {
-            // TODO: implement later if we want this...
+            if (exists(window.relay)) {
+                return window.relay.unsubscribe(channel);
+            }
+            return false;
         }
 
         /**
@@ -110,20 +116,18 @@
          * @return {Boolean}
          */
         function publish(channel, message) {
-
             OWF.Eventing.pubish(channel, message);
 
             if (exists(window.relay)) {
-                setTimeout(window.relay.publish(channel, message), 0);
+                return window.relay.publish(channel, message);
             }
+            return true;
         }
 
         /*
          * Expose public interface.
          */
         return {
-            /* variables */
-
             /* methods */
             publish: publish,
             subscribe: subscribe,

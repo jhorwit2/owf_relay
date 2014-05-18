@@ -12,8 +12,9 @@
  * @public
  * @param {String} host
  *   the host to connect to (ex: http://localhost:3000).
+ * @param {Boolean} secure : https if true, false if http
  */
-var loadRelay = function (host) {
+var loadRelay = function (host, secure) {
 
 /*
  * The root here is the appropriate global context (e.g. window in
@@ -63,13 +64,12 @@ var loadRelay = function (host) {
      *   object to check for emptiness.
      */
     var empty = function (x) {
-
         /* empty strings are not objects */
         if (typeof x === "string") {
             return x.trim() ? false : true;
         } else {
             /* no non-inherited properties means empty */
-            return Object.getOwnPropertyNames(x).length == 0;
+            return Object.getOwnPropertyNames(x).length === 0;
         }
     };
 
@@ -155,9 +155,9 @@ var loadRelay = function (host) {
         var lastToken = -1;
 
         return function tokenGenerator () {
-            return 't_' + (++lastToken);        
+            return 't_' + (++lastToken);
         };
-    };
+    }
 
     /*
      * This is the actual token generator which will be used
@@ -184,7 +184,10 @@ var loadRelay = function (host) {
      * This creates support for multiple widgets in the same tab or
      * various uMap widgets in different tabs.
      */
-    var socket = io.connect(host, {'force new connection':true});
+    console.log('about to try and connect');
+    secure = !secure ? false : secure; // If secure isn't defined then false else secure.
+    console.log('secure: ' + secure);
+    var socket = io.connect(host, {secure: secure, 'force new connection':true});
 
     /*
      * Set up initial callbacks for status monitoring.
@@ -193,9 +196,28 @@ var loadRelay = function (host) {
     socket.on('connect', function () {
         console.log('Socket connected! Global pub/sub is a go.');
 
+        window.addEventListener('mapReady', function() {
+            socket.emit('join', {status: 'new'});
+        });
+
         /* dispatch a new event to indicate the socket has connected. */
         var socketConnectedEvent = new Event('socketConnected');
         window.dispatchEvent(socketConnectedEvent);
+
+
+        socket.on('archive', function (msg) {
+                console.log(msg.length);
+                _(msg).each(function (message) {
+                    var deliver = createDeliveryFunction(
+                        message.topic,
+                        message.data,
+                        message.uid
+                    );
+
+                    /* asynchronously deliver the message to all subscribers */
+                    deliver();
+                });
+        });
 
         /**
          * Set up socket to receive global publishes.
@@ -218,7 +240,7 @@ var loadRelay = function (host) {
                 );
 
                 /* asynchronously deliver the message to all subscribers */
-                setTimeout(deliver, 0);
+                deliver();
 
                 /* send acknowledgement of message receipt to the server */
                 socket.emit('ack', msg);
@@ -227,8 +249,13 @@ var loadRelay = function (host) {
 
     });
 
+    socket.on('reconnect', function () {
+        socket.emit('join', {status: 'reconnect'});
+    });
+
     socket.on('disconnect', function () {
         console.log('Disconnected from server! This is bad.');
+        socket.socket.connect();
     });
 
     /*
@@ -279,7 +306,7 @@ var loadRelay = function (host) {
                 subscriber_list[subscriber](topic, data, uid);
             }
         };
-    };
+    }
 
     /**
      * Subscribe to messages from the host.
@@ -301,51 +328,72 @@ var loadRelay = function (host) {
         var token;
         validateHandler(handler);
 
-        /* topic is not registered yet */
-        if (!subscribers.hasOwnProperty(topic)) {
-            subscribers[topic] = {};
-        }
+		/* topic is not registered yet */
+		if (!subscribers.hasOwnProperty(topic)) {
+			subscribers[topic] = {};
+		}
 
         token = tokenGenerator();
         subscribers[topic][token] = handler;
 
         /* return token for unsubscribing */
         return token;
-    };
+    }
 
     /**
      * Unsubscribe from a subscription using the subscription token.
      *
      * @public
-     * @param {String} token
-     *   string returned from call to `subscribe`.
+     * @param {String} tokenOrFunction
+     *   string returned from call to `subscribe` or function
+     *   which was subscribed.
      * @return
      *   true if unsubscription was successful; false if the token
-     *   was not found and no callback was unsubscribed.
+     *   or function wasn't found and no callback was unsubscribed.
      * @throws InvalidToken
-     *   if the token is not of type `string`.
+     *   if the token is not of type `string` or `function`.
      */
-    function unsubscribe(token) {
-        var topic;
+    function unsubscribe(topic, tokenOrFunction) {
+        var token, isToken;
 
-        /* token must be a string */
-        if (typeof token !== "string") {
+        /* token must be a string or a function */
+        if (exists(tokenOrFunction) && typeof tokenOrFunction !== "string" &&
+        typeof tokenOrFunction !== "function") {
             throw {
                 name: 'InvalidToken',
-                message: 'token must be of type string',
-                token: token
+                message: 'token must be of type string or function',
+                token: tokenOrFunction
             };
         }
 
-        /* search all subscribers for token */
-        for (topic in subscribers) {
-            if (subscribers[topic].hasOwnProperty(token)) {
-                delete subscribers[topic][token];
-                return true;
+        if (!subscribers.hasOwnProperty(topic)) {
+            return false;
+        }
+
+        isToken = typeof tokenOrFunction === 'string';
+
+        /* if no tokenOrString, just unsubscribe all from topic */
+        if (!exists(tokenOrFunction)) {
+            delete subscribers[topic];
+            return true;
+        /* next try to match exact tokens */
+        } else if (isToken &&
+            subscribers[topic].hasOwnProperty(tokenOrFunction)) {
+            delete subscribers[topic][tokenOrFunction];
+            return true;
+        }
+        else {
+            /* if given a function, we need to look at the values */
+            for (token in subscribers[topic]) {
+                if (subscribers[topic].hasOwnProperty(token) &&
+                subscribers[topic][token] === tokenOrFunction) {
+                    delete subscribers[topic][token];
+                    return true;
+                }
             }
         }
         return false;
-    };
+    }
 
     /**
      * Publish to a topic with the given data.
@@ -381,7 +429,7 @@ var loadRelay = function (host) {
             data: data,
             uid: sender_id
         });
-    };
+    }
 
     /**
      * Listen on a response from the server.
@@ -399,7 +447,24 @@ var loadRelay = function (host) {
     function listen(channel, handler) {
         validateHandler(handler);
         socket.on(channel, handler);
-    };
+    }
+
+    /**
+     * Wrapper on socket.emit: send a message to the
+     * server on a channel.
+     *
+     * @public
+     * @param {String} channel
+     *   the channel to send the message on.
+     * @param {String} msg
+     *   the message to send.
+     * @throws SocketDisconnected
+     *   if the socket is not connected to the server.
+     */
+    function emit(channel, msg) {
+        ensureConnection(socket);
+        socket.emit(channel, msg);
+    }
 
     /**
      * Change the relay's room. The server only sends message to this
@@ -416,7 +481,7 @@ var loadRelay = function (host) {
     function switchRoom(room_name) {
         ensureConnection(socket);
         socket.emit('room.switch', room_name);
-    };
+    }
 
     /**
      * Get the name of the current room.
@@ -433,7 +498,7 @@ var loadRelay = function (host) {
         validateHandler(handler);
         socket.once('room.get.name', handler);
         socket.emit('room.get.name', '');
-    };
+    }
 
     /**
      * Request a list of all active rooms from server.
@@ -452,8 +517,7 @@ var loadRelay = function (host) {
         validateHandler(handler);
         socket.once('room.get.all.name', handler);
         socket.emit('room.get.all.name', '');
-    };
-
+    }
 
     /**
      * Register a name for the current user. If the user is already
@@ -472,7 +536,7 @@ var loadRelay = function (host) {
         ensureConnection(socket);
         checkForEmptyString(name, 'name');
         socket.emit('user.set.name', name);
-    };
+    }
 
     /**
      * Retrieve the registered name for this user.
@@ -489,7 +553,7 @@ var loadRelay = function (host) {
         validateHandler(handler);
         socket.once('user.get.name', handler);
         socket.emit('user.get.name', '');
-    };
+    }
 
     /**
      * Retreive the list of users in the current room.
@@ -507,7 +571,7 @@ var loadRelay = function (host) {
         validateHandler(handler);
         socket.once('user.get.all.name', handler);
         socket.emit('user.get.all.name', '');
-    };
+    }
 
     /*
      * Expose the public interface for relay.
@@ -520,6 +584,7 @@ var loadRelay = function (host) {
         unsubscribe: unsubscribe,
         publish: publish,
         listen: listen,
+        emit: emit,
 
         /* room management functionality */
         switchRoom:     switchRoom,
@@ -544,4 +609,3 @@ window.addEventListener('socketConnected', function () {
 });
 
 };
-

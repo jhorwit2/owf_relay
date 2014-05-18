@@ -69,10 +69,10 @@ function getUsers(room) {
 function addUser(user) {
     $('#room-users').append(
         $('<li>').attr({
-            'class': 'user',
-            'id': 'user_' + user
+        	'class': 'user',
+        	'id': 'user_' + user
         }).append(
-            $('<a>').html(user)
+        	$('<a>').html(user)
         )
     );
 }
