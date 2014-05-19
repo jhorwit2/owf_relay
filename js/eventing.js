@@ -48,7 +48,7 @@
 
             if (exists(window.relay)) {
                 message = $.parseJSON(message);
-                setTimeout(window.relay.publish(channel, message), 0);
+                setTimeout(window.relay.publish(channel, message, sender_uid.id), 0);
             }
         }
 
@@ -119,7 +119,7 @@
             OWF.Eventing.pubish(channel, message);
 
             if (exists(window.relay)) {
-                return window.relay.publish(channel, message);
+                return window.relay.publish(channel, message, OWF.getInstanceId());
             }
             return true;
         }
