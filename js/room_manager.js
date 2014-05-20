@@ -48,7 +48,7 @@ function getUsers(room) {
     window.relay.getAllUsers(function (allUsers) {
         var cu;
         if ($(users).not(allUsers).length !== 0 || $(allUsers).not(users).length !== 0) { //if array don't contain same elements
-            $('#room-users').html("");
+            $('#user-list').html("");
             users = [];
             window.relay.getUsername(function (currentUser) {
                 addUser(currentUser);
@@ -67,7 +67,7 @@ function getUsers(room) {
 }
 
 function addUser(user) {
-    $('#room-users').append(
+    $('#user-list').append(
         $('<li>').attr({
         	'class': 'user',
         	'id': 'user_' + user
@@ -96,7 +96,7 @@ $(document).ready(function () {
             if (userName !== "") {
                 $('#userName').val("");
                 relay.setUsername(userName);
-                $('#room-users .current a').html(userName);
+                $('#user-list .current a').html(userName);
             }
         });
 
