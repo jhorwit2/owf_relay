@@ -45,7 +45,7 @@ function addRoom(room) {
             )
         );
         $('#' + roomBtn).click(function () {
-            switchRoom(room)
+            switchRoom(room);
         });
     }
 }
@@ -53,7 +53,7 @@ function addRoom(room) {
 function roomExists(room) {
     var roomBtn = 'btn_' + domizeName(room);
 
-    return ($('#' + roomBtn).length)
+    return ($('#' + roomBtn).length);
 }
 
 function switchRoom(room) {
@@ -204,12 +204,12 @@ $(function () {
 
         /* When a new user joins, add to user list. */
         socket.on('user.join', function (user) {
-            addUser(user)
+            addUser(user);
         });
 
         /* When a user leaves, remove from user list. */
         socket.on('user.leave', function (user) {
-            removeUser(user)
+            removeUser(user);
         });
 
         /* When a user in the current room is renamed, switch out html. */
@@ -230,4 +230,3 @@ $(function () {
     }); /* end 'socketConnected' listener */
 
 }); /* end 'document.ready' listener */
-

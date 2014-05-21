@@ -35,8 +35,6 @@
          *   the uid of the widget that published this message.
          */
         function onServerReceive(channel, message, sender_uid) {
-            console.log('received from server');
-            console.log(channel, message, sender_uid);
             OWF.Eventing.publish(channel, JSON.stringify(message));
         }
 
@@ -48,6 +46,7 @@
 
             if (exists(window.relay)) {
                 message = $.parseJSON(message);
+                console.log('sender uid ' + sender_uid.id);
                 setTimeout(window.relay.publish(channel, message, sender_uid.id), 0);
             }
         }
